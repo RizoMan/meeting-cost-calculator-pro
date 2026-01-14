@@ -32,4 +32,27 @@
     - [x] **User Profile** (New Request)
         - [x] User Screen & Navigation <!-- id: 27 -->
         - [x] Home Screen Integration <!-- id: 28 -->
-- [ ] **Sprint 7-8: Polish & Launch** (Testing, Security Audit, Store Prep)
+- [ ] **Sprint 7-8: Polish & Launch** (Testing, Security Audit, Store Prep) (Ready to Start)
+
+## 🚀 Future Roadmap (High Potential)
+These features are identified to increase B2B value and recurring revenue.
+
+### Phase 2: Professional Tools (Retention)
+- [ ] **Calendar Integration (Google/Outlook)**
+    - Auto-import meetings and participants.
+    - Push notifications "Your $500 meeting is starting".
+- [ ] **Export & Reporting**
+    - Generate PDF/CSV reports for expense reimbursement.
+    - Email monthly summaries to managers.
+- [ ] **Widgets & Live Activities**
+    - **iOS Dynamic Island**: Show burning cash while app is backgrounded.
+    - **Home Screen Widget**: Quick "Start Meeting" button.
+
+### Phase 3: Team & Enterprise (B2B Expansion)
+- [ ] **Shared "Taximeter" (Web View)**
+    - Generate a unique URL for the meeting.
+    - Participants can watch the cost ticker in their browser/Zoom.
+- [ ] **Organization Accounts**
+    - Shared billing for companies.
+    - Centralized dashboard for the CFO.
+
