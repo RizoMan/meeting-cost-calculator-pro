@@ -3,6 +3,7 @@
     "name": "meeting-cost-calculator-pro",
     "slug": "meeting-cost-calculator-pro",
     "version": "1.0.0",
+    "scheme": "meetingcost",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
