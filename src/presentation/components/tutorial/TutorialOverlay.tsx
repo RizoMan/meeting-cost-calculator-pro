@@ -1,5 +1,6 @@
 
 import React, { useRef, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, FlatList, Dimensions, Platform, Animated } from 'react-native';
 import { theme } from '../../theme/theme';
 import { useTutorialStore } from '../../state/useTutorialStore';
@@ -8,36 +9,40 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 
-const SLIDES = [
-  {
-    id: '1',
-    title: 'Track Meeting Costs',
-    description: 'See exactly how much your meetings adhere to the budget in real-time.',
-    emoji: '💸',
-    gradient: ['#10B981', '#059669'] as const,
-  },
-  {
-    id: '2',
-    title: 'Save Teams',
-    description: 'Create and save participant groups for quick setup in daily standups.',
-    emoji: '👥',
-    gradient: ['#3B82F6', '#2563EB'] as const,
-  },
-  {
-    id: '3',
-    title: 'Analyze History',
-    description: 'Review past meeting costs and identify trends to optimize efficiency.',
-    emoji: '📊',
-    gradient: ['#F59E0B', '#D97706'] as const,
-  },
-];
+// SLIDES moved inside component for i18n
 
 export const TutorialOverlay = () => {
   const { isOpen, hasSeenTutorial, completeTutorial, closeTutorial, openTutorial } = useTutorialStore();
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   
+  // Dynamic slides because we need translations
+  const slides = [
+    {
+        id: '1',
+        title: t('tutorial.slide1Title'),
+        description: t('tutorial.slide1Desc'),
+        emoji: '💸',
+        gradient: ['#10B981', '#059669'] as const,
+    },
+    {
+        id: '2',
+        title: t('tutorial.slide2Title'),
+        description: t('tutorial.slide2Desc'),
+        emoji: '👥',
+        gradient: ['#3B82F6', '#2563EB'] as const,
+    },
+    {
+        id: '3',
+        title: t('tutorial.slide3Title'),
+        description: t('tutorial.slide3Desc'),
+        emoji: '📊',
+        gradient: ['#F59E0B', '#D97706'] as const,
+    },
+  ];
+
   // Animation for fade in/out
   const opacity = useRef(new Animated.Value(0)).current;
 
@@ -113,7 +118,7 @@ export const TutorialOverlay = () => {
   if (!isOpen) return null;
 
   const handleNext = () => {
-    if (currentIndex < SLIDES.length - 1) {
+    if (currentIndex < slides.length - 1) {
       flatListRef.current?.scrollToIndex({
         index: currentIndex + 1,
         animated: true,
@@ -127,7 +132,7 @@ export const TutorialOverlay = () => {
       completeTutorial();
   };
 
-  const renderItem = ({ item, index }: { item: typeof SLIDES[0], index: number }) => {
+  const renderItem = ({ item, index }: { item: typeof slides[0], index: number }) => {
     return (
       <View style={[styles.slide, { width, height }]}>
         <LinearGradient
@@ -151,12 +156,12 @@ export const TutorialOverlay = () => {
         <View style={[styles.background, { backgroundColor: theme.colors.background }]} />
         
         <TouchableOpacity style={[styles.skipButton, { top: insets.top + 10 }]} onPress={handleSkip}>
-            <Text style={styles.skipText}>Skip</Text>
+            <Text style={styles.skipText}>{t('tutorial.skip')}</Text>
         </TouchableOpacity>
 
         <FlatList
           ref={flatListRef}
-          data={SLIDES}
+          data={slides}
           renderItem={renderItem}
           horizontal
           pagingEnabled
@@ -171,7 +176,7 @@ export const TutorialOverlay = () => {
 
         <View style={[styles.footer, { paddingBottom: insets.bottom + 20 }]}>
             <View style={styles.pagination}>
-                {SLIDES.map((_, i) => (
+                {slides.map((_, i) => (
                     <View 
                         key={i} 
                         style={[
@@ -185,7 +190,7 @@ export const TutorialOverlay = () => {
 
             <TouchableOpacity style={styles.button} onPress={handleNext}>
                 <Text style={styles.buttonText}>
-                    {currentIndex === SLIDES.length - 1 ? "Get Started" : "Next"}
+                    {currentIndex === slides.length - 1 ? t('tutorial.getStarted') : t('tutorial.next')}
                 </Text>
             </TouchableOpacity>
         </View>

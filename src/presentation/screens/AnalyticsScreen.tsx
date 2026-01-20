@@ -1,4 +1,6 @@
+
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -7,11 +9,15 @@ import { theme } from '../theme/theme';
 import { MeetingRepositoryImpl } from '../../infrastructure/repositories/MeetingRepositoryImpl';
 import { AnalyticsService, DashboardStats } from '../../domain/services/AnalyticsService';
 import { useSubscriptionStore } from '../state/useSubscriptionStore';
+import { useSettingsStore } from '../state/useSettingsStore';
 
 export const AnalyticsScreen = () => {
     const router = useRouter();
+    const { t } = useTranslation();
     const insets = useSafeAreaInsets();
     const { isPro } = useSubscriptionStore();
+    const { currencyCode } = useSettingsStore();
+
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [insights, setInsights] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -38,7 +44,7 @@ export const AnalyticsScreen = () => {
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
-            currency: 'USD',
+            currency: currencyCode,
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
         }).format(amount);
@@ -47,7 +53,7 @@ export const AnalyticsScreen = () => {
     const formatDuration = (seconds: number) => {
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
-        return `${hours}h ${minutes}m`;
+        return `${hours}${t('common.hours')} ${minutes}${t('common.minutes')}`;
     };
 
     if (isLoading) {
@@ -64,9 +70,9 @@ export const AnalyticsScreen = () => {
             
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                    <Text style={styles.backButtonText}>← Back</Text>
+                    <Text style={styles.backButtonText}>← {t('common.back')}</Text>
                 </TouchableOpacity>
-                <Text style={styles.title}>Analytics</Text>
+                <Text style={styles.title}>{t('analytics.title')}</Text>
             </View>
 
             <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -79,7 +85,7 @@ export const AnalyticsScreen = () => {
                              end={{ x: 1, y: 1 }}
                              style={styles.mainCard}
                         >
-                            <Text style={styles.label}>Total Spent (All Time)</Text>
+                            <Text style={styles.label}>{t('analytics.totalSpent')}</Text>
                             <Text style={styles.bigNumber}>{formatCurrency(stats.totalCost)}</Text>
                         </LinearGradient>
 
@@ -88,7 +94,7 @@ export const AnalyticsScreen = () => {
                                 colors={[theme.colors.surface, theme.colors.surfaceHighlight]}
                                 style={styles.gridCard}
                              >
-                                <Text style={styles.smallLabel}>Meetings</Text>
+                                <Text style={styles.smallLabel}>{t('analytics.meetingCount')}</Text>
                                 <Text style={styles.midNumber}>{stats.meetingCount}</Text>
                              </LinearGradient>
 
@@ -96,7 +102,7 @@ export const AnalyticsScreen = () => {
                                 colors={[theme.colors.surface, theme.colors.surfaceHighlight]}
                                 style={styles.gridCard}
                              >
-                                <Text style={styles.smallLabel}>Total Time</Text>
+                                <Text style={styles.smallLabel}>{t('analytics.totalTime')}</Text>
                                 <Text style={styles.midNumber}>{formatDuration(stats.totalDurationSeconds)}</Text>
                              </LinearGradient>
                         </View>
@@ -105,12 +111,12 @@ export const AnalyticsScreen = () => {
                              colors={[theme.colors.surface, theme.colors.surfaceHighlight]}
                              style={styles.wideCard}
                         >
-                            <Text style={styles.smallLabel}>Avg. Cost per Meeting</Text>
+                            <Text style={styles.smallLabel}>{t('analytics.avgCost')}</Text>
                             <Text style={styles.midNumber}>{formatCurrency(stats.averageCost)}</Text>
                         </LinearGradient>
 
                         <View style={styles.sectionHeader}>
-                            <Text style={styles.sectionTitle}>AI Insights 🧠</Text>
+                            <Text style={styles.sectionTitle}>{t('analytics.insights')} 🧠</Text>
                         </View>
 
                         <View style={styles.insightsContainer}>
@@ -124,21 +130,21 @@ export const AnalyticsScreen = () => {
                                 <View style={styles.lockedContainer}>
                                     {/* Blurred/Obscured Content Mock */}
                                     <View style={[styles.insightBox, { opacity: 0.3 }]}>
-                                        <Text style={styles.insightText}>Lorem ipsum dolor sit amet, consider reducing meeting times by 15%.</Text>
+                                        <Text style={styles.insightText}>{t('analytics.insight1')}</Text>
                                     </View>
                                     <View style={[styles.insightBox, { opacity: 0.3 }]}>
-                                        <Text style={styles.insightText}>Tuesday meetings are trending higher in cost.</Text>
+                                        <Text style={styles.insightText}>{t('analytics.insight2')}</Text>
                                     </View>
                                     
                                     {/* Lock Overlay */}
                                     <View style={styles.lockOverlay}>
                                         <Text style={styles.lockIcon}>🔒</Text>
-                                        <Text style={styles.lockTitle}>Unlock AI Analysis</Text>
+                                        <Text style={styles.lockTitle}>{t('paywall.unlock')}</Text>
                                         <TouchableOpacity 
                                             style={styles.upgradeButton}
                                             onPress={() => router.push('/paywall')}
                                         >
-                                            <Text style={styles.upgradeText}>Upgrade to Pro</Text>
+                                            <Text style={styles.upgradeText}>{t('profile.upgrade')}</Text>
                                         </TouchableOpacity>
                                     </View>
                                 </View>
@@ -296,3 +302,4 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     }
 });
+

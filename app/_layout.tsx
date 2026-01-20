@@ -5,6 +5,8 @@ import { theme } from '../src/presentation/theme/theme';
 import * as NavigationBar from 'expo-navigation-bar';
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import i18n from '../src/infrastructure/i18n/i18n'; // Initialize i18n on app start
 
 import { TutorialOverlay } from '../src/presentation/components/tutorial/TutorialOverlay';
 import { useTutorialStore } from '../src/presentation/state/useTutorialStore';
@@ -24,6 +26,19 @@ export default function Layout() {
       NavigationBar.setBehaviorAsync("overlay-swipe");
       NavigationBar.setBackgroundColorAsync("#00000000"); // Transparent
     }
+
+    // Load persisted language
+    const loadLanguage = async () => {
+       try {
+          const savedLang = await AsyncStorage.getItem('user-language');
+          if (savedLang) {
+             i18n.changeLanguage(savedLang);
+          }
+       } catch (e) {
+          console.error("Failed to load language", e);
+       }
+    };
+    loadLanguage();
   }, []);
 
   return (

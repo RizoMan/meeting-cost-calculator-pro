@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -10,6 +11,7 @@ import { useMeetingStore } from '../state/useMeetingStore';
 
 export const SavedTeamsScreen = () => {
   const router = useRouter();
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { setParticipants } = useMeetingStore();
   const [teams, setTeams] = useState<Team[]>([]);
@@ -39,12 +41,12 @@ export const SavedTeamsScreen = () => {
 
   const handleDeleteTeam = async (id: string) => {
     Alert.alert(
-        "Delete Team",
-        "Are you sure?",
+        t('common.deleteTeamTitle'),
+        t('common.deleteConfirm'),
         [
-            { text: "Cancel", style: "cancel" },
+            { text: t('common.cancel'), style: "cancel" },
             { 
-                text: "Delete", 
+                text: t('common.delete'), 
                 style: "destructive", 
                 onPress: async () => {
                     const repo = new TeamRepositoryImpl();
@@ -65,7 +67,7 @@ export const SavedTeamsScreen = () => {
     >
       <View style={styles.cardHeader}>
         <Text style={styles.teamName}>{item.name}</Text>
-        <Text style={styles.memberCount}>{item.participants.length} Members</Text>
+        <Text style={styles.memberCount}>{item.participants.length} {t('home.members')}</Text>
       </View>
       
       <View style={styles.participantsPreview}>
@@ -79,13 +81,13 @@ export const SavedTeamsScreen = () => {
             style={[styles.button, styles.deleteButton]}
             onPress={() => handleDeleteTeam(item.id)}
           >
-              <Text style={styles.deleteText}>Delete</Text>
+              <Text style={styles.deleteText}>{t('common.delete')}</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={[styles.button, styles.loadButton]}
             onPress={() => handleLoadTeam(item)}
           >
-              <Text style={styles.loadText}>Load Team</Text>
+              <Text style={styles.loadText}>{t('home.loadTeam')}</Text>
           </TouchableOpacity>
       </View>
     </LinearGradient>
@@ -97,9 +99,9 @@ export const SavedTeamsScreen = () => {
       
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← Back</Text>
+          <Text style={styles.backButtonText}>← {t('common.back')}</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>Saved Teams</Text>
+        <Text style={styles.title}>{t('home.savedTeams')}</Text>
       </View>
 
       <FlatList
@@ -111,7 +113,7 @@ export const SavedTeamsScreen = () => {
         onRefresh={loadTeams}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No saved teams found.</Text>
+             <Text style={styles.emptyText}>{t('home.noTeams')}</Text>
           </View>
         }
       />

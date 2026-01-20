@@ -1,11 +1,13 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '../theme/theme';
 import { useSubscriptionStore } from '../state/useSubscriptionStore';
+import { ScreenBackground } from '../components/ScreenBackground';
 
 const BENEFITS = [
     { emoji: '🧠', title: 'Smart AI Analysis', desc: 'Get deep insights into your meeting costs.' },
@@ -14,6 +16,7 @@ const BENEFITS = [
 ];
 
 export const PaywallScreen = () => {
+    const { t } = useTranslation();
     const router = useRouter();
     const insets = useSafeAreaInsets();
     const { upgrade, restorePurchase, isLoading, isPro } = useSubscriptionStore();
@@ -21,32 +24,28 @@ export const PaywallScreen = () => {
     const handlePurchase = async () => {
         try {
             await upgrade();
-            Alert.alert("Success", "Welcome to Pro!", [
-                { text: "OK", onPress: () => router.back() }
+            Alert.alert(t('common.success'), t('paywall.successMsg'), [
+                { text: t('common.ok'), onPress: () => router.back() }
             ]);
         } catch (error) {
-            Alert.alert("Error", "Purchase failed. Please try again.");
+            Alert.alert(t('common.error'), t('paywall.purchaseFailed'));
         }
     };
 
     const handleRestore = async () => {
         try {
             await restorePurchase();
-            Alert.alert("Restored", "Your purchases have been restored.", [
-                 { text: "OK", onPress: () => router.back() }
+            Alert.alert(t('paywall.restoredTitle'), t('paywall.restoredMsg'), [
+                 { text: t('common.ok'), onPress: () => router.back() }
             ]);
         } catch (error) {
-            Alert.alert("Error", "Could not verify purchases.");
+            Alert.alert(t('common.error'), t('paywall.verifyError'));
         }
     };
 
     return (
-        <View style={styles.container}>
+        <ScreenBackground preset="immersive" style={styles.container}>
             <Stack.Screen options={{ headerShown: false }} />
-            <LinearGradient
-                colors={['#000000', '#111827']}
-                style={StyleSheet.absoluteFillObject}
-            />
 
             <View style={[styles.header, { marginTop: insets.top + theme.spacing.m }]}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.closeButton}>
@@ -62,30 +61,42 @@ export const PaywallScreen = () => {
                     >
                         <Text style={styles.heroIcon}>👑</Text>
                     </LinearGradient>
-                    <Text style={styles.heroTitle}>Upgrade to Pro</Text>
-                    <Text style={styles.heroSubtitle}>Unlock the full potential of your meetings.</Text>
+                    <Text style={styles.heroTitle}>{t('paywall.title')}</Text>
+                    <Text style={styles.heroSubtitle}>{t('paywall.subtitle')}</Text>
                 </View>
 
                 <View style={styles.benefitsContainer}>
-                    {BENEFITS.map((benefit, index) => (
-                        <View key={index} style={styles.benefitRow}>
-                            <Text style={styles.benefitEmoji}>{benefit.emoji}</Text>
+                        <View style={styles.benefitRow}>
+                            <Text style={styles.benefitEmoji}>🧠</Text>
                             <View>
-                                <Text style={styles.benefitTitle}>{benefit.title}</Text>
-                                <Text style={styles.benefitDesc}>{benefit.desc}</Text>
+                                <Text style={styles.benefitTitle}>{t('paywall.benefit1Title')}</Text>
+                                <Text style={styles.benefitDesc}>{t('paywall.benefit1Desc')}</Text>
                             </View>
                         </View>
-                    ))}
+                        <View style={styles.benefitRow}>
+                            <Text style={styles.benefitEmoji}>♾️</Text>
+                            <View>
+                                <Text style={styles.benefitTitle}>{t('paywall.benefit2Title')}</Text>
+                                <Text style={styles.benefitDesc}>{t('paywall.benefit2Desc')}</Text>
+                            </View>
+                        </View>
+                        <View style={styles.benefitRow}>
+                            <Text style={styles.benefitEmoji}>🎨</Text>
+                            <View>
+                                <Text style={styles.benefitTitle}>{t('paywall.benefit3Title')}</Text>
+                                <Text style={styles.benefitDesc}>{t('paywall.benefit3Desc')}</Text>
+                            </View>
+                        </View>
                 </View>
 
                 {/* Pricing Card */}
                 <View style={styles.pricingCard}>
-                     <Text style={styles.planName}>Lifetime Access</Text>
+                     <Text style={styles.planName}>{t('paywall.lifetime')}</Text>
                      <View style={styles.priceRow}>
                          <Text style={styles.price}>$9.99</Text>
-                         <Text style={styles.frequency}>/ once</Text>
+                         <Text style={styles.frequency}>{t('paywall.once')}</Text>
                      </View>
-                     <Text style={styles.guarantee}>No subscriptions. One-time payment.</Text>
+                     <Text style={styles.guarantee}>{t('paywall.noSub')}</Text>
                 </View>
             </ScrollView>
 
@@ -98,22 +109,22 @@ export const PaywallScreen = () => {
                     {isLoading ? (
                         <ActivityIndicator color="#000" />
                     ) : (
-                        <Text style={styles.purchaseText}>Unlock Pro Now</Text>
+                        <Text style={styles.purchaseText}>{t('paywall.unlock')}</Text>
                     )}
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={handleRestore} disabled={isLoading}>
-                    <Text style={styles.restoreText}>Restore Purchases</Text>
+                    <Text style={styles.restoreText}>{t('paywall.restore')}</Text>
                 </TouchableOpacity>
             </View>
-        </View>
+        </ScreenBackground>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000',
+
     },
     header: {
         paddingHorizontal: theme.spacing.l,
@@ -198,9 +209,9 @@ const styles = StyleSheet.create({
         width: '100%',
         padding: theme.spacing.l,
         borderRadius: theme.borderRadius.l,
-        borderWidth: 1,
+        borderWidth: StyleSheet.hairlineWidth,
         borderColor: theme.colors.primary,
-         backgroundColor: 'rgba(16, 185, 129, 0.1)',
+         backgroundColor: 'rgba(16, 185, 129, 0.05)',
         alignItems: 'center',
     },
     planName: {

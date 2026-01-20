@@ -4,6 +4,8 @@ import { CostCalculator } from '../../domain/services/CostCalculator';
 import * as Crypto from 'expo-crypto';
 import { MeetingRepositoryImpl } from '../../infrastructure/repositories/MeetingRepositoryImpl';
 
+
+
 interface MeetingState {
   currentMeeting: Meeting;
   
@@ -14,9 +16,12 @@ interface MeetingState {
   resetMeeting: () => void;
   tick: () => void; // Called every second
   
-  addParticipant: (name: string, hourlyRate: number) => void;
+  addParticipant: (name: string, hourlyRate: number, email?: string) => void;
+  updateParticipant: (id: string, updates: Partial<Participant>) => void;
   removeParticipant: (id: string) => void;
   setParticipants: (participants: Participant[]) => void;
+  setMeetingTitle: (title: string) => void;
+  setExpectedDuration: (minutes: number) => void;
 }
 
 export const useMeetingStore = create<MeetingState>((set, get) => ({
@@ -81,11 +86,12 @@ export const useMeetingStore = create<MeetingState>((set, get) => ({
     return { currentMeeting: nextMeeting };
   }),
 
-  addParticipant: (name, hourlyRate) => set((state) => {
+  addParticipant: (name, hourlyRate, email) => set((state) => {
     const newParticipant: Participant = {
       id: Crypto.randomUUID(),
       name,
-      hourlyRate
+      hourlyRate,
+      email
     };
     return {
       currentMeeting: {
@@ -94,6 +100,15 @@ export const useMeetingStore = create<MeetingState>((set, get) => ({
       }
     };
   }),
+
+  updateParticipant: (id, updates) => set((state) => ({
+    currentMeeting: {
+      ...state.currentMeeting,
+      participants: state.currentMeeting.participants.map(p => 
+        p.id === id ? { ...p, ...updates } : p
+      )
+    }
+  })),
 
   removeParticipant: (id) => set((state) => ({
     currentMeeting: {
@@ -106,6 +121,20 @@ export const useMeetingStore = create<MeetingState>((set, get) => ({
     currentMeeting: {
       ...state.currentMeeting,
       participants
+    }
+  })),
+
+  setMeetingTitle: (title: string) => set((state) => ({
+    currentMeeting: {
+      ...state.currentMeeting,
+      title
+    }
+  })),
+
+  setExpectedDuration: (minutes: number) => set((state) => ({
+    currentMeeting: {
+      ...state.currentMeeting,
+      expectedDurationMinutes: minutes
     }
   })),
 }));
