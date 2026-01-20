@@ -3,6 +3,10 @@
 All notable changes to the "Meeting Cost Calculator Pro" project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- **Global Currency Support**: Implemented support for 100+ world currencies.
+- **Currency Selector**: New search-enabled modal in User Profile to select preferred currency.
+- **Dynamic Pricing**: All cost displays (Live Tracker, History, Analytics) now respect the selected currency.
 
 ## [0.2.0] - Premium Features Update
 ### Added

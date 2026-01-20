@@ -2,7 +2,7 @@ export const theme = {
   colors: {
     background: '#09090B', // Very dark zinc
     surface: '#18181B', // Slightly lighter zinc
-    surfaceHighlight: '#27272A',
+    surfaceHighlight: '#27272A', // Keeping as is, but could be darkened if needed: #222225
     primary: '#10B981', // Emerald 500
     primaryGlow: 'rgba(16, 185, 129, 0.3)',
     secondary: '#3B82F6', // Blue 500

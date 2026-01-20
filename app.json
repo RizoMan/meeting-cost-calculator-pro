@@ -1,31 +1,41 @@
 {
   "expo": {
-    "name": "meeting-cost-calculator-pro",
-    "slug": "meeting-cost-calculator-pro",
+    "name": "Meeting Cost Pro",
+    "slug": "meeting-cost-pro",
     "version": "1.0.0",
     "scheme": "meetingcost",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#09090B"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.rizoman.meetingcostpro"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#09090B"
       },
+      "package": "com.rizoman.meetingcostpro",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-calendar",
+        {
+          "calendarPermission": "Allow Meeting Cost Pro to access your calendar to import meeting details?"
+        }
+      ]
+    ]
   }
 }

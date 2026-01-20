@@ -1,44 +1,35 @@
 # Next Session Guide - Meeting Cost Calculator Pro
 
-**Last Updated:** v0.2.0 (Premium Features Complete)
-**Current Phase:** Ready for "Sprint 7-8: Polish & Launch"
+**Last Updated:** v1.0.0 (Release Candidate)
+**Current Phase:** "Release: Build & Distribute"
 **Documentation:**
-- [FEATURES_READY.md](./FEATURES_READY.md): Manual of working features.
-- [task.md](./task.md): Includes new "Future Roadmap" (Phase 2 & 3).
+- [FEATURES_READY.md](./FEATURES_READY.md): Manual of working features (now includes i18n).
+- [task.md](./task.md): Completed tasks checklist.
 
 ## 🚀 Current Status
-The application is feature-complete for an internal MVP/Beta.
-- **Core**: Meeting Tracking, History (SQLite), Team Management.
-- **Premium**: Paywall UI, User Profile, "AI" Insights (Local Heuristics), Usage Limits.
-- **Architecture**: Clean Architecture (Domain/Infrastructure/Presentation) with strict TypeScript.
+The application is **Feature Complete** and **Fully Internationalized**.
+- **i18n**: Support for EN, ES, IT, PT, ZH, FR is verified and 100% implemented.
+- **Polish**: UI is high-fidelity with verified dark mode and safe areas.
+- **Core Loop**: Tracking -> Saving -> History -> Analytics is fully functional.
 
-## ⚠️ Critical Context (Technical Debt/Mocks)
-Before launching to a real store, you must address these **Mocks**:
-1.  **Subscription System**:
-    - File: `src/presentation/state/useSubscriptionStore.ts`
-    - Status: Uses `setTimeout` to simulate purchases.
-    - Action: Integrate **RevenueCat** or **Expo In-App Purchases** if real payments are needed.
-2.  **AI Analysis**:
-    - File: `src/domain/services/AnalyticsService.ts`
-    - Status: Uses deterministic if/else logic to generate text.
-    - Action: Keep as is for "offline AI" (selling point: privacy) OR connect to OpenAI API for dynamic insights.
+## ⚠️ Known state
+- **Mock Payments**: The Paywall uses a mock store. This is expected for the Beta/MVP.
+- **Local AI**: Insights are generated algorithmically on-device, not via external API.
 
 ## 📋 Immediate Next Steps
-When you resume, start here:
+When you resume, your focus is **Delivery**:
 
-1.  **Visual Polish**:
-    - Check `src/presentation/theme/theme.ts`. ensure Dark Mode colors are accessible.
-    - Verify "Safe Area" on physical devices (especially Paywall & Profile).
+1.  **Production Build**:
+    - Run `eas build -p android` (or iOS if applicable).
+    - Or generate local APK: `npx expo run:android --variant release`.
 
-2.  **Testing**:
-    - Run the app on a **real Android/iOS device** (not just simulator).
-    - Verify database persistence after app close/reopen.
+2.  **Beta Testing Validation**:
+    - Install the APK on a physical device.
+    - Change device language to Spanish/Chinese/etc. to verify auto-detection on a fresh install.
+    - Test the "Upgrade to Pro" flow (Mock) to ensure the badge updates correctly.
 
-3.  **Store Assets**:
-    - `app.json`: Update `displayName`, `slug`, `ios.bundleIdentifier`, `android.package`.
-    - Generate `privacy_policy.md` (Stub in `docs/` but needs content).
+3.  **Store Submission (Optional)**:
+    - If testing passes, prepare screenshots and descriptions for the Play Store using the new localized texts.
 
 ## 🤖 Kickstart Prompt
-Copy-paste this to the AI agent to resume context instantly:
-
-> "Hola, retomemos el proyecto 'Meeting Cost Calculator Pro'. Estamos en la fase de Polish & Launch. Revisa `docs/NEXT_SESSION.md` para ver el estado actual. Quiero empezar revisando el archivo `app.json` para preparar la build de Android."
+> "I'm back. The app is fully localized and polished. Let's start the build process for Android and verify the release candidate."

@@ -1,4 +1,6 @@
+
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -6,11 +8,18 @@ import { theme } from '../theme/theme';
 import { Meeting } from '../../domain/entities/Meeting';
 import { MeetingRepositoryImpl } from '../../infrastructure/repositories/MeetingRepositoryImpl';
 import { useSubscriptionStore } from '../state/useSubscriptionStore';
+import { useSettingsStore } from '../state/useSettingsStore';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ExportService } from '../../application/services/ExportService';
+import { Alert } from 'react-native';
+
+
+
 export const HistoryScreen = () => {
   const router = useRouter();
+  const { t, i18n } = useTranslation();
   const insets = useSafeAreaInsets();
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -23,7 +32,6 @@ export const HistoryScreen = () => {
     try {
       const repo = new MeetingRepositoryImpl();
       const data = await repo.getAll();
-      // Sort by start time descending (newest first)
       const sorted = data.sort((a, b) => {
         const timeA = a.startTime ? new Date(a.startTime).getTime() : 0;
         const timeB = b.startTime ? new Date(b.startTime).getTime() : 0;
@@ -38,19 +46,40 @@ export const HistoryScreen = () => {
   };
 
   const { isPro } = useSubscriptionStore();
+  const { currencyCode, getCurrencySymbol } = useSettingsStore();
+
   const displayedMeetings = isPro ? meetings : meetings.slice(0, 3);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
         style: 'currency',
-        currency: 'USD',
+        currency: currencyCode,
         minimumFractionDigits: 2
     }).format(amount);
   };
 
+  const handleExportPDF = async (meeting: Meeting) => {
+      try {
+          const uri = await ExportService.generateMeetingPDF(meeting, getCurrencySymbol(), currencyCode, t, i18n.language);
+          await ExportService.shareFile(uri);
+      } catch (error) {
+          Alert.alert(t('common.error'), t('common.exportError') || 'Failed to export PDF');
+      }
+  };
+
+  const handleExportCSV = async () => {
+      if (meetings.length === 0) return;
+      try {
+          const uri = await ExportService.generateHistoryCSV(meetings, t, i18n.language);
+          await ExportService.shareFile(uri);
+      } catch (error) {
+          Alert.alert(t('common.error'), t('common.exportError') || 'Failed to export CSV');
+      }
+  };
+
   const formatDate = (date: Date | string | null) => {
-    if (!date) return 'Unknown Date';
-    return new Date(date).toLocaleDateString('en-US', {
+    if (!date) return t('common.unknownDate');
+    return new Date(date).toLocaleDateString(i18n.language, {
       weekday: 'short',
       month: 'short',
       day: 'numeric',
@@ -76,26 +105,34 @@ export const HistoryScreen = () => {
       <View style={styles.cardHeader}>
         <Text style={styles.dateText}>{formatDate(item.startTime)}</Text>
         <View style={[styles.statusBadge, item.status === 'completed' ? styles.statusCompleted : styles.statusIncomplete]}>
-          <Text style={styles.statusText}>{item.status}</Text>
+          <Text style={styles.statusText}>{item.status === 'completed' ? t('tracker.status.completed') : t('tracker.status.active')}</Text>
         </View>
       </View>
       
       <View style={styles.cardBody}>
         <View>
-            <Text style={styles.label}>Total Cost</Text>
+            <Text style={styles.label}>{t('history.title')}</Text>
+            <Text style={styles.label}>{t('tracker.currentCost')}</Text>
             <Text style={[styles.costText, { textShadowColor: theme.colors.primaryGlow, textShadowRadius: 8 }]}>
               {formatCurrency(item.accumulatedCost)}
             </Text>
         </View>
         <View style={{ alignItems: 'flex-end' }}>
-            <Text style={styles.label}>Duration</Text>
+            <Text style={styles.label}>{t('history.duration')}</Text>
             <Text style={styles.durationText}>{formatDuration(item.elapsedSeconds)}</Text>
         </View>
       </View>
 
       <Text style={styles.participantsText}>
-        {item.participants.length} Participant{item.participants.length !== 1 ? 's' : ''}
+        {item.participants.length} {t('tracker.participants')}
       </Text>
+
+      <TouchableOpacity 
+        style={styles.exportButton}
+        onPress={() => handleExportPDF(item)}
+      >
+        <Text style={styles.exportButtonText}>📄 {t('common.exportPDF') || 'Export PDF'}</Text>
+      </TouchableOpacity>
     </LinearGradient>
   );
 
@@ -104,10 +141,18 @@ export const HistoryScreen = () => {
       <Stack.Screen options={{ headerShown: false }} />
       
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.title}>Meeting History</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: theme.spacing.m }}>
+            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+              <Text style={styles.backButtonText}>← {t('common.back')}</Text>
+            </TouchableOpacity>
+            <Text style={styles.title}>{t('history.title')}</Text>
+        </View>
+        
+        {isPro && meetings.length > 0 && (
+            <TouchableOpacity onPress={handleExportCSV} style={styles.csvButton}>
+                <Text style={styles.csvButtonText}>📊 CSV</Text>
+            </TouchableOpacity>
+        )}
       </View>
 
       <FlatList
@@ -120,17 +165,17 @@ export const HistoryScreen = () => {
         ListFooterComponent={
             !isPro && meetings.length > 3 ? (
                 <View style={styles.upgradeCard}>
-                    <Text style={styles.upgradeTitle}>View Full History</Text>
-                    <Text style={styles.upgradeDesc}>Upgrade to Pro to see all past meetings.</Text>
+                    <Text style={styles.upgradeTitle}>{t('paywall.benefit2Desc')}...</Text>
+                    <Text style={styles.upgradeDesc}>{t('paywall.unlock')}</Text>
                     <TouchableOpacity style={styles.upgradeButton} onPress={() => router.push('/paywall')}>
-                        <Text style={styles.upgradeBtnText}>Upgrade Now</Text>
+                        <Text style={styles.upgradeBtnText}>{t('profile.upgrade')}</Text>
                     </TouchableOpacity>
                 </View>
             ) : null
         }
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No meetings recorded yet.</Text>
+            <Text style={styles.emptyText}>{t('history.noMeetings')}</Text>
           </View>
         }
       />
@@ -147,9 +192,9 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     marginTop: theme.spacing.xl,
     marginBottom: theme.spacing.l,
-    gap: theme.spacing.m,
   },
   backButton: {
     padding: theme.spacing.s,
@@ -173,11 +218,11 @@ const styles = StyleSheet.create({
     padding: theme.spacing.m,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    shadowColor: '#000', // Shadow for iOS
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
-    elevation: 4, // Shadow for Android
+    elevation: 4,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -196,10 +241,10 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   statusCompleted: {
-    backgroundColor: 'rgba(16, 185, 129, 0.1)', // Primary/Emerald low opacity
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
   },
   statusIncomplete: {
-    backgroundColor: 'rgba(239, 68, 68, 0.1)', // Danger/Red low opacity
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
   },
   statusText: {
     color: theme.colors.text.primary,
@@ -270,5 +315,30 @@ const styles = StyleSheet.create({
   upgradeBtnText: {
       color: '#000',
       fontWeight: 'bold',
+  },
+  exportButton: {
+      marginTop: theme.spacing.m,
+      backgroundColor: 'rgba(255,255,255,0.1)',
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      borderRadius: theme.borderRadius.s,
+      alignSelf: 'flex-start',
+  },
+  exportButtonText: {
+      color: theme.colors.text.primary,
+      fontSize: 12,
+      fontWeight: '600',
+  },
+  csvButton: {
+      backgroundColor: theme.colors.surface,
+      padding: 8,
+      borderRadius: theme.borderRadius.s,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+  },
+  csvButtonText: {
+      color: theme.colors.primary,
+      fontWeight: 'bold',
+      fontSize: 12,
   }
 });

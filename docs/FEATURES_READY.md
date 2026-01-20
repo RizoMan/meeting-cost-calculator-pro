@@ -73,3 +73,14 @@ This document maintains a comprehensive list of all functionalities currently im
 - **Clean Architecture:** Domain / Infrastructure / Presentation layers.
 - **Offline First:** Fully functional without internet (SQLite + Async Storage).
 - **Strict Typing:** 100% TypeScript coverage.
+
+### 10. High-Fidelity UI (Polish)
+- **Anti-Banding Gradients:** Custom interpolation logic for smooth dark backgrounds.
+- **Hi-DPI Awareness:** Uses `hairlineWidth` for crisp borders on Retina/OLED displays.
+- **OLED Blacks:** True black backgrounds for energy saving and premium aesthetics.
+
+### 11. Internationalization (i18n) - **READY**
+- **Multi-Language Support**: English, Spanish, Italian, Portuguese, Chinese, French.
+- **Full Coverage**: 100% of UI strings, including Alerts, Tutorials, Charts, and Dynamic Text.
+- **Auto-Detect**: Uses device locale settings with manual override in Profile.
+- **Extensible**: JSON-based locale architecture for easy addition of new languages.

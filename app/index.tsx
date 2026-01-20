@@ -1,11 +1,13 @@
 import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
 import { Link, useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { theme } from '../src/presentation/theme/theme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function Index() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
 
   return (
     <ImageBackground 
@@ -22,14 +24,14 @@ export default function Index() {
         </TouchableOpacity>
 
         <View style={styles.content}>
-          <Text style={styles.title}>Meeting Cost</Text>
-          <Text style={styles.subtitle}>CALCULATOR PRO</Text>
+          <Text style={styles.title}>{t('landing.title')}</Text>
+          <Text style={styles.subtitle}>{t('landing.subtitle')}</Text>
           
           <TouchableOpacity 
             style={styles.ctaButton}
             onPress={() => router.push('/meeting/setup')}
           >
-            <Text style={styles.ctaText}>Start New Meeting</Text>
+            <Text style={styles.ctaText}>{t('landing.start')}</Text>
           </TouchableOpacity>
 
           <View style={styles.secondaryActions}>
@@ -37,30 +39,37 @@ export default function Index() {
                 style={styles.secondaryButton}
                 onPress={() => router.push('/meeting/history')}
               >
-                <Text style={styles.secondaryButtonText}>History</Text>
+                <Text style={styles.secondaryButtonText}>{t('landing.history')}</Text>
               </TouchableOpacity>
               
-              <View style={styles.divider} />
+
 
               <TouchableOpacity 
                 style={styles.secondaryButton}
                 onPress={() => router.push('/meeting/analytics')}
               >
-                <Text style={styles.secondaryButtonText}>Analytics</Text>
+                <Text style={styles.secondaryButtonText}>{t('landing.analytics')}</Text>
               </TouchableOpacity>
 
-              <View style={styles.divider} />
+
 
               <TouchableOpacity 
                 style={styles.secondaryButton}
                 onPress={() => {
-                  /* We need to import useTutorialStore here or just expose a route. 
-                     Since it's a store, we can just use the store. */
                    const { openTutorial } = require('../src/presentation/state/useTutorialStore').useTutorialStore.getState();
                    openTutorial();
                 }}
               >
-                <Text style={styles.secondaryButtonText}>Tutorial</Text>
+                <Text style={styles.secondaryButtonText}>{t('landing.tutorial')}</Text>
+              </TouchableOpacity>
+              
+
+
+              <TouchableOpacity 
+                style={styles.secondaryButton}
+                onPress={() => router.push('/tools/currency-converter')}
+              >
+                <Text style={styles.secondaryButtonText}>💱 {t('landing.converter') || 'Converter'}</Text>
               </TouchableOpacity>
           </View>
         </View>
@@ -128,6 +137,9 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       marginTop: theme.spacing.xl,
       alignItems: 'center',
+      flexWrap: 'wrap', // Allow wrapping
+      justifyContent: 'center', // Center items
+      gap: theme.spacing.m, // Use gap instead of dividers
   },
   secondaryButton: {
     paddingVertical: theme.spacing.s,
